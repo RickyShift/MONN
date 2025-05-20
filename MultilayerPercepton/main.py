@@ -1,5 +1,11 @@
 import random
 import math
+import csv
+
+import NeuralNetwork
+
+
+
 
 # Activation function and its derivatives
 def sigmoid(x):
@@ -11,16 +17,20 @@ def sigmoid_derivative(x):
 
 
 
+
+
 # Initialize weights and bias
-def initialize_neural_network(structure: list[int]):
+def initialize_neural_network(structure: list[int],
+                              activation_function: function,
+                              activation_function_derivative: function):
     # a structure of type [a, b_1, ..., b_n, c] means:
     # a inputs, b_i neurons for each i hidden layer, and c outputs
 
     if (len(structure) <= 1):
         return "NN must more than one layer"
 
-    weight_matrices = [1, 2]
-    biases = [1, 2]
+    weight_matrices = []
+    biases = []
 
     # there are len(structure)-1 weight matrices
     for m in range(len(structure) - 1):
@@ -31,35 +41,63 @@ def initialize_neural_network(structure: list[int]):
         # the second layer has structure[m+1] neurons
         # the weight matrix has a dimension of structure[m+1] x structure[m]
         # for example, if the structure is [2, 3, 4], then the weight matrices are in order, 3x2 and 4x3
-        weight_matrices[m] = [[random.uniform(-1, 1) for _ in range(structure[m+1])] for _ in range(structure[m])]
+        weight_matrices.append([[random.uniform(-1, 1) for _ in range(structure[m+1])] for _ in range(structure[m])])
 
         # finally there are as many biases as neurons on the second layer
-        biases.append([random.uniform(-1, 1) for _ in range(structure[m+1])])
+        # biases.append([random.uniform(-1, 1) for _ in range(structure[m+1])])
+        biases.append([0 for _ in range(structure[m+1])])
 
-        # Record the initial weights and bias
-        with open("MultilayerPercepton\Storage\demofile.txt", "a") as f:
-            f.write(str(weight_matrices[m]) + str("\n"))
+    # record the weights and biases in a csv file
+    with open('MultilayerPercepton/Storage/example.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        i = 0
+        for matrix in weight_matrices:
+            for row in matrix:
+                writer.writerow(row)
+            writer.writerow([])
+            writer.writerow(biases[i])
+            writer.writerow([])
+            i+=1
+
+    # return these matrices inside a custum class object
+    return NeuralNetwork(weight_matrices, biases)
+        
+
+def main():
+    nn_structure = [2,1]
+    activation_function = sigmoid
+    activation_function_derivative = sigmoid_derivative
+
+    neuralNetwork = initialize_neural_network(nn_structure, activation_function, activation_function_derivative)
+
+    inputs = [[0, 0], [0, 1], [1, 0], [1, 1]]
+    outputs = [0, 1, 1, 0]
+
+    # Training loop
+    while True:
+        total_error = 0
+
+        for x, y in zip(inputs, outputs):
+
+            neuralNetwork.feed_forward()
 
 
-    
-
-
-initialize_neural_network([2,3,4])
-
-
-# Dataset for training (XOR problem)
-inputs = [[0, 0], [0, 1], [1, 0], [1, 1]]
-outputs = [0, 1, 1, 0]
-
-
-
-# Hyperparameters
-learning_rate = 0.1
-epochs = 10000
 
 
 
 
+
+
+main()
+
+
+# # Dataset for training (XOR problem)
+# inputs = [[0, 0], [0, 1], [1, 0], [1, 1]]
+# outputs = [0, 1, 1, 0]
+
+# # Hyperparameters
+# learning_rate = 0.1
+# epochs = 10000
 
 # # Training loop
 # for epoch in range(epochs):
