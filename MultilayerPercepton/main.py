@@ -2,7 +2,7 @@ import random
 import math
 import csv
 
-import NeuralNetwork
+from NeuralNetwork import NeuralNetwork
 
 
 
@@ -21,8 +21,8 @@ def sigmoid_derivative(x):
 
 # Initialize weights and bias
 def initialize_neural_network(structure: list[int],
-                              activation_function: function,
-                              activation_function_derivative: function):
+                              activation_function,
+                              activation_function_derivative):
     # a structure of type [a, b_1, ..., b_n, c] means:
     # a inputs, b_i neurons for each i hidden layer, and c outputs
 
@@ -36,7 +36,6 @@ def initialize_neural_network(structure: list[int],
     for m in range(len(structure) - 1):
 
         # we will now construct the weight matrices by analysing all two consecutive layers
-
         # the first layer has structure[m] neurons
         # the second layer has structure[m+1] neurons
         # the weight matrix has a dimension of structure[m+1] x structure[m]
@@ -45,7 +44,7 @@ def initialize_neural_network(structure: list[int],
 
         # finally there are as many biases as neurons on the second layer
         # biases.append([random.uniform(-1, 1) for _ in range(structure[m+1])])
-        biases.append([0 for _ in range(structure[m+1])])
+        biases.append([random.uniform(-1, 1) for _ in range(structure[m+1])])
 
     # record the weights and biases in a csv file
     with open('MultilayerPercepton/Storage/example.csv', mode='w', newline='') as file:
@@ -60,7 +59,8 @@ def initialize_neural_network(structure: list[int],
             i+=1
 
     # return these matrices inside a custum class object
-    return NeuralNetwork(weight_matrices, biases)
+    nn = NeuralNetwork(weight_matrices, biases, activation_function, activation_function_derivative)
+    return nn
         
 
 def main():
@@ -70,16 +70,23 @@ def main():
 
     neuralNetwork = initialize_neural_network(nn_structure, activation_function, activation_function_derivative)
 
-    inputs = [[0, 0], [0, 1], [1, 0], [1, 1]]
-    outputs = [0, 1, 1, 0]
+    data = [[[0, 0], 0], [[0, 1], 1], [[1, 0], 1], [[1, 1], 0]]
+
+    # hyper parameters
+
 
     # Training loop
     while True:
         total_error = 0
 
-        for x, y in zip(inputs, outputs):
+        for input, output in data:
 
-            neuralNetwork.feed_forward()
+            prediction = neuralNetwork.feed_forward(input)
+            print(prediction)
+
+            break
+
+        break
 
 
 
